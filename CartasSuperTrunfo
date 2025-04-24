@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+#define MAX_CARTAS 4
+#define MAX_ATRIBUTOS 4
+#define MAX_NOME 20
+
+typedef struct {
+    char nome[MAX_NOME];
+    int atributos[MAX_ATRIBUTOS]; // População, Pontos Turísticos, PIB per capita, IDH
+} Carta;
+
+void gerar_cartas(Carta *cartas, char *nomes[], int quantidade) {
+    srand(time(NULL));
+    for (int i = 0; i < quantidade; i++) {
+        strcpy(cartas[i].nome, nomes[i]);
+        cartas[i].atributos[0] = rand() % 1000000 + 100000; // População
+        cartas[i].atributos[1] = rand() % 10 + 1; // Pontos Turísticos
+        cartas[i].atributos[2] = rand() % 50000 + 10000; // PIB per capita
+        cartas[i].atributos[3] = rand() % 10 + 1; // IDH
+    }
+}
+
+void imprimir_carta(Carta carta) {
+    printf("Cidade: %s\n", carta.nome);
+    printf("1 - População: %d\n", carta.atributos[0]);
+    printf("2 - Pontos Turísticos: %d\n", carta.atributos[1]);
+    printf("3 - PIB per capita: %d\n", carta.atributos[2]);
+    printf("4 - IDH: %d\n", carta.atributos[3]);
+}
+
+void jogo() {
+    char *nomes[] = {"Rio de Janeiro", "Niterói", "Duque de Caxias", "Nova Iguaçu", "São Gonçalo", "Itaboraí", "Magé", "Mesquita"};
+    Carta cartas[8];
+    gerar_cartas(cartas, nomes, 8);
+
+    Carta jogador1_cartas[MAX_CARTAS];
+    Carta jogador2_cartas[MAX_CARTAS];
+
+    // Distribuir cartas
+    for (int i = 0; i < MAX_CARTAS; i++) {
+        jogador1_cartas[i] = cartas[i];
+        jogador2_cartas[i] = cartas[i + MAX_CARTAS];
+    }
+
+    int jogador1_pontos = 0;
+    int jogador2_pontos = 0;
+
+    for (int i = 0; i < MAX_CARTAS; i++) {
+        printf("Rodada %d:\n", i + 1);
+
+        // Jogador 1
+        printf("Carta do Jogador 1:\n");
+        imprimir_carta(jogador1_cartas[i]);
+        printf("\nCarta do Jogador 2:\n");
+        printf("Cidade: %s\n", jogador2_cartas[i].nome);
+        printf("Atributos ocultos...\n");
+
+        int atributo;
+        printf("Jogador 1, escolha o atributo (1-4): ");
+        scanf("%d", &atributo);
+        atributo--;
+
+        printf("Carta do Jogador 2:\n");
+        imprimir_carta(jogador2_cartas[i]);
+
+        if (jogador1_cartas[i].atributos[atributo] > jogador2_cartas[i].atributos[atributo]) {
+            jogador1_pontos += 2;
+            printf("Jogador 1 venceu!\n");
+        } else if (jogador2_cartas[i].atributos[atributo] > jogador1_cartas[i].atributos[atributo]) {
+            jogador2_pontos += 2;
+            printf("Jogador 2 venceu!\n");
+        } else {
+            jogador1_pontos += 1;
+            jogador2_pontos += 1;
+            printf("Empate!\n");
+        }
+
+        printf("Pontuação: Jogador 1 %d, Jogador 2 %d\n\n", jogador1_pontos, jogador2_pontos);
+    }
+
+    if (jogador1_pontos > jogador2_pontos) {
+        printf("Jogador 1 venceu o jogo!\n");
+    } else if (jogador2_pontos > jogador1_pontos) {
+        printf("Jogador 2 venceu o jogo!\n");
+    } else {
+        printf("Jogo empatado!\n");
+    }
+}
+
+int main() {
+    jogo();
+    return 0;
+}
